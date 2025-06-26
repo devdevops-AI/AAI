@@ -1,0 +1,47 @@
+version: '3.9'
+services:
+  catalog-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: catalog
+      POSTGRES_USER: catalog
+      POSTGRES_PASSWORD: catalog
+    volumes:
+      - catalog-data:/var/lib/postgresql/data
+    networks:
+      - intranet
+
+  admin_ui:
+    build: ./admin_ui
+    depends_on:
+      - catalog-db
+      - llm
+    networks:
+      - intranet
+
+  operator_ui:
+    build: ./operator_ui
+    depends_on:
+      - catalog-db
+      - execution_engine
+    networks:
+      - intranet
+
+  execution_engine:
+    build: ./execution_engine
+    depends_on:
+      - catalog-db
+    networks:
+      - intranet
+
+  llm:
+    build: ./llm
+    networks:
+      - intranet
+
+volumes:
+  catalog-data:
+
+networks:
+  intranet:
+    driver: bridge
